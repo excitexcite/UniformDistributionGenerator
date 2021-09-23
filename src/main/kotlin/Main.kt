@@ -2,6 +2,7 @@ import java.io.BufferedWriter
 import java.io.File
 import kotlin.math.ceil
 import kotlin.math.log10
+import kotlin.math.pow
 
 // number of values to random
 const val n = 10000
@@ -36,10 +37,39 @@ fun main(args: Array<String>) {
     val scaledFrequencyValues = getScaledFrequencyValues(frequencyList, intervalLength)
 //    writeFile(histogramBoundaries, frequencyList)
     writeFile(histogramBoundaries, scaledFrequencyValues)
+    getProbability(histogramBoundaries)
+//    val theoreticalProbability = intervalLength.toDouble() / (maxValue - minValue)
+//    println(theoreticalProbability)
+    val theoreticalProbability = 1.0 / numOfIntervals
+    println(theoreticalProbability)
+
+    val chi = calculatePearsonCriteria(frequencyList, theoreticalProbability)
+    println("Chi = $chi")
     println(frequencyList)
     println(frequencyList.sum())
     // Try adding program arguments at Run/Debug configuration
     println("Program arguments: ${args.joinToString()}")
+}
+
+fun getProbability(histogramBoundaries: List<Int>) : List<Double>{
+    val listProbability = mutableListOf<Double>()
+    for (i in 0 until histogramBoundaries.size - 1) {
+        listProbability.add(1.0 / (histogramBoundaries[i+1] - histogramBoundaries[i]))
+    }
+    println(listProbability)
+    return  listProbability
+}
+
+/**
+ *  The function calculates pearson criteria value for random values that we made by the uniform
+ *  random values generator
+ */
+fun calculatePearsonCriteria(frequencyList: List<Int>, theoreticalProbability: Double): Double {
+    var chi = 0.0
+    for (frequecny in frequencyList) {
+        chi += (frequecny - n * theoreticalProbability).pow(2) / (n * theoreticalProbability)
+    }
+    return chi
 }
 
 /**
